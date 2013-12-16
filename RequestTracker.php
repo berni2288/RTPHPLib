@@ -322,11 +322,20 @@ class RequestTracker{
         $response = explode(chr(10), $response['body']);
         array_shift($response);
         array_shift($response);
+
+        $currentKey = null;
         foreach($response as $line){
-            $parts = explode($delimiter, $line);
-            $key = array_shift($parts);
-            $value = implode($delimiter, $parts);
-            $responseArray[$key] = trim($value);
+            if ($line[0] === " ") {
+                $value .= " " . trim($line);
+            } else {
+                $parts = explode($delimiter, $line, 2);
+                $currentKey = trim($parts[0]);
+                $value = trim($parts[1]);
+            }
+
+            if (!empty($currentKey)) {
+                $responseArray[$currentKey] = $value;
+            }
         }
 
         return $responseArray;
